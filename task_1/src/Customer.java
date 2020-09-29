@@ -4,10 +4,8 @@ public class Customer {
     private Account account;
 
     public Customer(String name, String lastName) {
-        if (name == "" || name == null)
-            throw new IllegalArgumentException("Name can't be an empty string");
-        if (lastName == "" || lastName == null)
-            throw new IllegalArgumentException("Last name can't be an empty string");
+        if (!isValidName(name) || !isValidLastName(lastName))
+            throw new IllegalArgumentException("Invalid string format");
         this.name = name;
         this.lastName = lastName;
     }
@@ -74,5 +72,13 @@ public class Customer {
             return false;
         }
         return account.add(amount);
+    }
+
+    private boolean isValidName(String name) {
+        return name != "" && name != null;
+    }
+
+    private boolean isValidLastName(String lastName) {
+        return lastName != "" && lastName != null;
     }
 }

@@ -15,10 +15,9 @@ public class Account {
      * otherwise returns false
      */
     public boolean withdraw(double amount) {
-        if (amount < 0)
+        if (!canWithdraw(amount)) {
             return false;
-        if (balance - amount < 0)
-            return false;
+        }
         balance -= amount;
         return true;
     }
@@ -30,9 +29,14 @@ public class Account {
      * @return true if amount &gt 0, otherwise returns false
      */
     public boolean add(double amount) {
-        if (amount < 0)
+        if (amount < 0) {
             return false;
+        }
         balance += amount;
         return true;
+    }
+
+    private boolean canWithdraw(double amount) {
+        return amount > 0 && balance - amount > 0;
     }
 }
