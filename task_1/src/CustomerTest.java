@@ -5,30 +5,38 @@ class CustomerTest {
 
     @Test
     void createCustomer_throwsException_whenNameNull() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            Customer customerWithEmptyLine = new Customer(null, "Petrov");
-        });
+        Throwable thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Customer(null, "Petrov")
+        );
+        assertEquals("Invalid string format", thrown.getMessage());
     }
 
     @Test
     void createCustomer_throwsException_whenNameEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            Customer customerWithEmptyLine = new Customer("", "Petrov");
-        });
+        Throwable thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Customer("", "Petrov")
+        );
+        assertEquals("Invalid string format", thrown.getMessage());
     }
 
     @Test
     void createCustomer_throwsException_whenLastNameNull() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            Customer customerWithEmptyLine = new Customer("Petr", null);
-        });
+        Throwable thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Customer("Petr", null)
+        );
+        assertEquals("Invalid string format", thrown.getMessage());
     }
 
     @Test
     void createCustomer_throwsException_whenLastNameEmpty() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            Customer customerWithEmptyLine = new Customer("Petr", "");
-        });
+        Throwable thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Customer("Petr", "")
+        );
+        assertEquals("Invalid string format", thrown.getMessage());
     }
 
     @Test
