@@ -3,12 +3,12 @@ import java.time.LocalDateTime;
 public class Transaction {
     private final long id;
     private final double amount;
-    private final Account originator;
-    private final Account beneficiary;
+    private final DebitCard originator;
+    private final DebitCard beneficiary;
     private final boolean executed;
     private final boolean rolledBack;
 
-    public Transaction(long id, double amount, Account originator, Account beneficiary) {
+    public Transaction(long id, double amount, DebitCard originator, DebitCard beneficiary) {
         this.id = id;
         this.amount = amount;
         this.originator = originator;
@@ -30,11 +30,11 @@ public class Transaction {
         return id;
     }
 
-    public Account getOriginator() {
+    public DebitCard getOriginator() {
         return originator;
     }
 
-    public Account getBeneficiary() {
+    public DebitCard getBeneficiary() {
         return beneficiary;
     }
 
@@ -62,6 +62,8 @@ public class Transaction {
         if (originator != null) {
             Entry originatorEntry = new Entry(originator, executedTransaction, -amount, LocalDateTime.now());
             originator.addEntry(originatorEntry);
+            Entry bonusEntry = new Entry(originator, executedTransaction, amount * originator.getBonusPercentage(), LocalDateTime.now());
+            originator.addEntryToBonusAccount(bonusEntry);
         }
         if (beneficiary != null) {
             Entry beneficiaryEntry = new Entry(beneficiary, executedTransaction, amount, LocalDateTime.now());
@@ -82,6 +84,8 @@ public class Transaction {
         if (originator != null) {
             Entry originatorEntry = new Entry(originator, rolledBackTransaction, amount, LocalDateTime.now());
             originator.addEntry(originatorEntry);
+            Entry bonusEntry = new Entry(originator, rolledBackTransaction, -amount * originator.getBonusPercentage(), LocalDateTime.now());
+            originator.addEntryToBonusAccount(bonusEntry);
         }
         if (beneficiary != null) {
             Entry beneficiaryEntry = new Entry(beneficiary, rolledBackTransaction, -amount, LocalDateTime.now());

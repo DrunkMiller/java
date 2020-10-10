@@ -17,13 +17,13 @@ public class TransactionManager {
         transactionsIdCounter = 0;
     }
 
-    public Transaction createTransaction(double amount, Account originator, Account beneficiary) {
+    public Transaction createTransaction(double amount, DebitCard originator, DebitCard beneficiary) {
         Transaction transaction = new Transaction(transactionsIdCounter++, amount, originator, beneficiary);
         transactions.add(transaction);
         return transaction;
     }
 
-    public Collection<Transaction> findAllTransactionsByAccount(Account account) {
+    public Collection<Transaction> findAllTransactionsByAccount(DebitCard account) {
         List<Transaction> transactionsByAccount = new LinkedList<Transaction>();
         for (Transaction transaction : transactions) {
             if (isTransactionMember(account, transaction)) {
@@ -37,7 +37,7 @@ public class TransactionManager {
         transactions.add(transaction.rollback());
     }
 
-    public void rollbackLastTransactionByAccount(Account account) {
+    public void rollbackLastTransactionByAccount(DebitCard account) {
         LinkedList<Transaction> transactionsByAccount = new LinkedList<Transaction>(findAllTransactionsByAccount(account));
         rollbackTransaction(transactionsByAccount.getLast());
     }
@@ -46,7 +46,7 @@ public class TransactionManager {
         transactions.add(transaction.execute());
     }
 
-    private boolean isTransactionMember(Account account, Transaction transaction) {
+    private boolean isTransactionMember(DebitCard account, Transaction transaction) {
         return (transaction.getBeneficiary() != null && transaction.getBeneficiary().equals(account))
                 || (transaction.getOriginator() != null && transaction.getOriginator().equals(account));
     }

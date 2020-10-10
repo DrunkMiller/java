@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -28,8 +27,8 @@ public class TestTransaction {
     @Test
     void execute_shouldCreateCorrectEntries() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
-        Account account1 = new Account(1, transactionManager);
-        Account account2 = new Account(2, transactionManager);
+        DebitCard account1 = new DebitCard(1, transactionManager, 1);
+        DebitCard account2 = new DebitCard(2, transactionManager, 1);
         account1.add(200);
         LocalDateTime currentDateTime = LocalDateTime.now();
         TimeUnit.MILLISECONDS.sleep(1);
@@ -46,8 +45,8 @@ public class TestTransaction {
     @Test
     void rollback_shouldCreateCorrectEntries() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
-        Account account1 = new Account(1, transactionManager);
-        Account account2 = new Account(2, transactionManager);
+        DebitCard account1 = new DebitCard(1, transactionManager, 1);
+        DebitCard account2 = new DebitCard(2, transactionManager, 1);
         account1.add(200);
         Transaction transaction = new Transaction(1, 100, account1, account2);
         Transaction executedTransaction = transaction.execute();

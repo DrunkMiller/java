@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -18,15 +17,15 @@ public class TestAnalyticsManager {
     void mostFrequentBeneficiaryOfAccount_shouldReturnCorrectBeneficiary() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
         AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
-        Account account1 = new Account(1, transactionManager);
-        Account account2 = new Account(2, transactionManager);
-        Account account3 = new Account(3, transactionManager);
+        DebitCard account1 = new DebitCard(1, transactionManager, 1);
+        DebitCard account2 = new DebitCard(2, transactionManager, 1);
+        DebitCard account3 = new DebitCard(3, transactionManager, 1);
         account1.add(10_000);
         TimeUnit.MILLISECONDS.sleep(1);
         account1.withdraw(1_000, account2);
         account1.withdraw(2_000, account2);
         account1.withdraw(3_000, account3);
-        Account actual = analyticsManager.mostFrequentBeneficiaryOfAccount(account1);
+        DebitCard actual = analyticsManager.mostFrequentBeneficiaryOfAccount(account1);
         assertEquals(account2, actual);
         account1.withdraw(1_000, account3);
         account1.withdraw(1_000, account3);

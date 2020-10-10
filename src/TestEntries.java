@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
@@ -16,13 +15,13 @@ public class TestEntries {
     @BeforeEach
     void setUpEntries() {
         entries = new Entries();
-        entry1 = new Entry(mock(Account.class), mock(Transaction.class), 100,
+        entry1 = new Entry(mock(DebitCard.class), mock(Transaction.class), 100,
                 LocalDateTime.of(2019,2, 21, 4, 8));
-        entry2 = new Entry(mock(Account.class), mock(Transaction.class), 100,
+        entry2 = new Entry(mock(DebitCard.class), mock(Transaction.class), 100,
                 LocalDateTime.of(2019,7, 22, 12, 33));
-        entry3 = new Entry(mock(Account.class), mock(Transaction.class), 100,
+        entry3 = new Entry(mock(DebitCard.class), mock(Transaction.class), 100,
                 LocalDateTime.of(2020,5, 11, 5, 42));
-        entry4 = new Entry(mock(Account.class), mock(Transaction.class), 100,
+        entry4 = new Entry(mock(DebitCard.class), mock(Transaction.class), 100,
                 LocalDateTime.of(2020,6, 12, 11, 9));
         entries.addEntry(entry1);
         entries.addEntry(entry2);
