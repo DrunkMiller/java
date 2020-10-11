@@ -1,3 +1,5 @@
+package accounts;
+
 import java.time.LocalDateTime;
 
 public interface Account {

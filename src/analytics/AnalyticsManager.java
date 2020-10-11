@@ -1,3 +1,12 @@
+package analytics;
+
+import accounts.Account;
+import accounts.DebitCard;
+import storage.KeyExtractor;
+import storage.TransactionKeyExtractor;
+import transactions.Transaction;
+import transactions.TransactionManager;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -50,23 +59,25 @@ public class AnalyticsManager {
 
     public double overallBalanceOfAccounts(List<? extends Account> accounts) {
         double overallBalance = 0;
+        LocalDateTime dateTime = LocalDateTime.now();
         for (Account account : accounts) {
-            overallBalance += account.balanceOn(LocalDateTime.now());
+            overallBalance += account.balanceOn(dateTime);
         }
         return overallBalance;
     }
 
-    public <K extends Comparable<? super K>> Set<K> uniqueKeysOf(List<? extends Account> accounts, KeyExtractor<K, Account> extractor) {
+    public <T, K extends Comparable<? super K>> Set<K> uniqueKeysOf(List<? extends T> entities, KeyExtractor<K, ? super T> extractor) {
         Set<K> uniqueKeys = new TreeSet<>();
-        for (Account account : accounts) {
-            uniqueKeys.add(extractor.extract(account));
+        for (T entity : entities) {
+            uniqueKeys.add(extractor.extract(entity));
         }
         return uniqueKeys;
     }
 
-    public List<? extends Account> accountsRangeFrom(List<? extends Account> accounts, Account minAccount, Comparator<Account> comparator) {
+    public List<Account> accountsRangeFrom(List<? extends Account> accounts, Account minAccount, Comparator<Account> comparator) {
         List<Account> sortedAccounts = new ArrayList<>(accounts);
         sortedAccounts.sort(comparator);
         return sortedAccounts.subList(sortedAccounts.indexOf(minAccount), sortedAccounts.size());
     }
+
 }

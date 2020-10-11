@@ -1,3 +1,9 @@
+package transactions;
+
+import accounts.BonusAccount;
+import accounts.DebitCard;
+import accounts.Entry;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,8 +33,8 @@ public class TestTransaction {
     @Test
     void execute_shouldCreateCorrectEntries() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
-        DebitCard account1 = new DebitCard(1, transactionManager, 1);
-        DebitCard account2 = new DebitCard(2, transactionManager, 1);
+        DebitCard account1 = new DebitCard(1, transactionManager, new BonusAccount(0));
+        DebitCard account2 = new DebitCard(2, transactionManager, new BonusAccount(0));
         account1.add(200);
         LocalDateTime currentDateTime = LocalDateTime.now();
         TimeUnit.MILLISECONDS.sleep(1);
@@ -38,15 +44,15 @@ public class TestTransaction {
         List<Entry> history2 = new ArrayList<Entry>(account2.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
         assertEquals(1, history1.size());
         assertEquals(1, history2.size());
-        assertEquals(-100, history1.get(0).getAmount());
-        assertEquals(100, history2.get(0).getAmount());
+        Assertions.assertEquals(-100, history1.get(0).getAmount());
+        Assertions.assertEquals(100, history2.get(0).getAmount());
     }
 
     @Test
     void rollback_shouldCreateCorrectEntries() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
-        DebitCard account1 = new DebitCard(1, transactionManager, 1);
-        DebitCard account2 = new DebitCard(2, transactionManager, 1);
+        DebitCard account1 = new DebitCard(1, transactionManager, new BonusAccount(0));
+        DebitCard account2 = new DebitCard(2, transactionManager, new BonusAccount(0));
         account1.add(200);
         Transaction transaction = new Transaction(1, 100, account1, account2);
         Transaction executedTransaction = transaction.execute();
@@ -57,8 +63,8 @@ public class TestTransaction {
         List<Entry> history2 = new ArrayList<Entry>(account2.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
         assertEquals(1, history1.size());
         assertEquals(1, history2.size());
-        assertEquals(100, history1.get(0).getAmount());
-        assertEquals(-100, history2.get(0).getAmount());
+        Assertions.assertEquals(100, history1.get(0).getAmount());
+        Assertions.assertEquals(-100, history2.get(0).getAmount());
     }
 
     @Test

@@ -1,3 +1,8 @@
+package transactions;
+
+import accounts.DebitCard;
+import accounts.Entry;
+
 import java.time.LocalDateTime;
 
 public class Transaction {
@@ -56,18 +61,25 @@ public class Transaction {
      */
     public Transaction execute() {
         if (executed) {
-            throw new IllegalStateException("Transaction was already executed");
+            throw new IllegalStateException("transactions.Transaction was already executed");
         }
         Transaction executedTransaction = new Transaction(this, true, false);
         if (originator != null) {
             Entry originatorEntry = new Entry(originator, executedTransaction, -amount, LocalDateTime.now());
-            originator.addEntry(originatorEntry);
-            Entry bonusEntry = new Entry(originator, executedTransaction, amount * originator.getBonusPercentage(), LocalDateTime.now());
-            originator.addEntryToBonusAccount(bonusEntry);
+            originatorEntry.accept();
+
+        }
+        if (originator != null && originator.getBonusAccount() != null) {
+            Entry bonusEntry = new Entry(
+                    originator.getBonusAccount(),
+                    executedTransaction,
+                    amount * originator.getBonusAccount().getBonusPercentage(),
+                    LocalDateTime.now());
+            bonusEntry.accept();
         }
         if (beneficiary != null) {
             Entry beneficiaryEntry = new Entry(beneficiary, executedTransaction, amount, LocalDateTime.now());
-            beneficiary.addEntry(beneficiaryEntry);
+            beneficiaryEntry.accept();
         }
         return executedTransaction;
     }
@@ -78,18 +90,30 @@ public class Transaction {
      */
     public Transaction rollback() {
         if (rolledBack || !executed) {
-            throw new IllegalStateException("Transaction was already rolled back");
+            throw new IllegalStateException("transactions.Transaction was already rolled back");
         }
         Transaction rolledBackTransaction = new Transaction(this, false, true);
         if (originator != null) {
             Entry originatorEntry = new Entry(originator, rolledBackTransaction, amount, LocalDateTime.now());
-            originator.addEntry(originatorEntry);
-            Entry bonusEntry = new Entry(originator, rolledBackTransaction, -amount * originator.getBonusPercentage(), LocalDateTime.now());
-            originator.addEntryToBonusAccount(bonusEntry);
+            originatorEntry.accept();
+            Entry bonusEntry = new Entry(
+                    originator.getBonusAccount(),
+                    rolledBackTransaction,
+                    -amount * originator.getBonusAccount().getBonusPercentage(),
+                    LocalDateTime.now());
+            bonusEntry.accept();
+        }
+        if (originator != null && originator.getBonusAccount() != null) {
+            Entry bonusEntry = new Entry(
+                    originator.getBonusAccount(),
+                    rolledBackTransaction,
+                    -amount * originator.getBonusAccount().getBonusPercentage(),
+                    LocalDateTime.now());
+            bonusEntry.accept();
         }
         if (beneficiary != null) {
             Entry beneficiaryEntry = new Entry(beneficiary, rolledBackTransaction, -amount, LocalDateTime.now());
-            beneficiary.addEntry(beneficiaryEntry);
+            beneficiaryEntry.accept();
         }
         return rolledBackTransaction;
     }

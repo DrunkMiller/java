@@ -1,3 +1,7 @@
+package transactions;
+
+import accounts.DebitCard;
+
 import java.util.*;
 
 public class TransactionManager {
@@ -6,7 +10,7 @@ public class TransactionManager {
      * @param amount
      * @param originator
      * @param beneficiary
-     * @return created Transaction
+     * @return created transactions.Transaction
      */
 
     private final LinkedList<Transaction> transactions;

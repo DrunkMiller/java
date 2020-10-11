@@ -1,3 +1,7 @@
+package accounts;
+
+import transactions.Transaction;
+import transactions.TransactionManager;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
@@ -5,26 +9,21 @@ public class DebitCard implements Account {
     private final long id;
     private final TransactionManager transactionManager;
     private final Entries entries;
-    private final double bonusPercentage;
     private final BonusAccount bonusAccount;
 
-    public DebitCard(long id, TransactionManager transactionManager, double bonusPercentage) {
-        if (bonusPercentage < 0 || bonusPercentage > 1) {
-            throw new  IllegalArgumentException("bonus percentage must be between 0 and 1");
-        }
+    public DebitCard(long id, TransactionManager transactionManager, BonusAccount bonusAccount) {
         this.id = id;
         this.transactionManager = transactionManager;
-        this.bonusPercentage = bonusPercentage;
-        this.bonusAccount = new BonusAccount();
+        this.bonusAccount = bonusAccount;
         this.entries = new Entries();
     }
 
-    public double getBonusPercentage() {
-        return bonusPercentage;
+    public BonusAccount getBonusAccount() {
+        return bonusAccount;
     }
 
     /**
-     * Withdraws money from account. <b>Should use TransactionManager to manage transactions</b>
+     * Withdraws money from account. <b>Should use transactions.TransactionManager to manage transactions</b>
      *
      * @param amount amount of money to withdraw
      * @return true
@@ -41,7 +40,7 @@ public class DebitCard implements Account {
     }
 
     /**
-     * Withdraws cash money from account. <b>Should use TransactionManager to manage transactions</b>
+     * Withdraws cash money from account. <b>Should use transactions.TransactionManager to manage transactions</b>
      *
      * @param amount amount of money to withdraw
      * @return true
@@ -58,7 +57,7 @@ public class DebitCard implements Account {
     }
 
     /**
-     * Adds cash money to account. <b>Should use TransactionManager to manage transactions</b>
+     * Adds cash money to account. <b>Should use transactions.TransactionManager to manage transactions</b>
      *
      * @param amount amount of money to add
      * @return true
@@ -75,7 +74,7 @@ public class DebitCard implements Account {
     }
 
     /**
-     * Adds money to account. <b>Should use TransactionManager to manage transactions</b>
+     * Adds money to account. <b>Should use transactions.TransactionManager to manage transactions</b>
      *
      * @param amount amount of money to add
      * @return true
@@ -107,7 +106,10 @@ public class DebitCard implements Account {
         for (Entry entry : entries.to(date)) {
             balance += entry.getAmount();
         }
-        return balance + bonusAccount.balanceOn(date);
+        if (bonusAccount != null) {
+            balance += bonusAccount.balanceOn(date);
+        }
+        return balance;
     }
 
     /**
@@ -120,10 +122,6 @@ public class DebitCard implements Account {
     @Override
     public void addEntry(Entry entry) {
         entries.addEntry(entry);
-    }
-
-    void addEntryToBonusAccount(Entry entry) {
-        bonusAccount.addEntry(entry);
     }
 
     private boolean canWithdraw(double amount) {

@@ -1,12 +1,17 @@
+package accounts;
+
+import accounts.Account;
+import transactions.Transaction;
+
 import java.time.LocalDateTime;
 
 public class Entry {
-    private final DebitCard account;
+    private final Account account;
     private final Transaction transaction;
     private final double amount;
     private final LocalDateTime time;
 
-    public Entry(DebitCard account, Transaction transaction, double amount, LocalDateTime time) {
+    public Entry(Account account, Transaction transaction, double amount, LocalDateTime time) {
         this.account = account;
         this.transaction = transaction;
         this.amount = amount;
@@ -19,6 +24,10 @@ public class Entry {
 
     public double getAmount() {
         return amount;
+    }
+
+    public void accept() {
+        account.addEntry(this);
     }
 }
 

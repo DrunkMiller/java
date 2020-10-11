@@ -1,5 +1,11 @@
+package accounts;
+
+import accounts.DebitCard;
+import accounts.Entries;
+import accounts.Entry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import transactions.Transaction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

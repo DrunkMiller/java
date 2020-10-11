@@ -1,3 +1,5 @@
+package storage;
+
 import java.util.Collection;
 
 public interface BankEntitiesStorage<K, T> {
