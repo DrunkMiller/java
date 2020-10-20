@@ -1,6 +1,7 @@
 package accounts;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 public class BonusAccount implements Account {
     private final Entries entries;
@@ -30,5 +31,10 @@ public class BonusAccount implements Account {
     @Override
     public void addEntry(Entry entry) {
         entries.addEntry(entry);
+    }
+
+    @Override
+    public Collection<Entry> history(LocalDateTime from, LocalDateTime to) {
+        return entries.betweenDates(from, to);
     }
 }

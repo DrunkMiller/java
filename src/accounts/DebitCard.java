@@ -18,6 +18,10 @@ public class DebitCard implements Account {
         this.entries = new Entries();
     }
 
+    public long getId() {
+        return id;
+    }
+
     public BonusAccount getBonusAccount() {
         return bonusAccount;
     }
@@ -90,7 +94,7 @@ public class DebitCard implements Account {
         return true;
     }
 
-
+    @Override
     public Collection<Entry> history(LocalDateTime from, LocalDateTime to) {
         return entries.betweenDates(from, to);
     }

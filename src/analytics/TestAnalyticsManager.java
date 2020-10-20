@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import accounts.Account;
 import accounts.BonusAccount;
 import accounts.DebitCard;
+import accounts.Entry;
 import org.junit.jupiter.api.Test;
 import storage.KeyExtractor;
 import storage.TransactionKeyExtractor;
@@ -140,6 +141,29 @@ public class TestAnalyticsManager {
                 }
         );
         assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    void maxExpenseAmountEntryWithinInterval() throws InterruptedException {
+        TransactionManager transactionManager = new TransactionManager();
+        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
+        DebitCard account1 = new DebitCard(1, transactionManager, null);
+        account1.addCash(10_000);
+        DebitCard account2 = new DebitCard(2, transactionManager, null);
+        account2.addCash(10_000);
+        LocalDateTime timeStart = LocalDateTime.now();
+        TimeUnit.MILLISECONDS.sleep(1);
+        account1.withdraw(1_000, account2);
+        account1.withdraw(3_000, account2);
+        account1.withdraw(500, account2);
+        account2.withdraw(2000, account1);
+        LocalDateTime timeEnd = LocalDateTime.now().plusNanos(100);
+        Entry expected = account1.history(timeStart, timeEnd)
+                .stream()
+                .max((o1, o2) -> (int) (o2.getAmount() - o1.getAmount()))
+                .get();
+        Entry actual = analyticsManager.maxExpenseAmountEntryWithinInterval(Arrays.asList(account1, account2), timeStart, timeEnd).get();
+        assertEquals(expected, actual);
     }
 
 }
