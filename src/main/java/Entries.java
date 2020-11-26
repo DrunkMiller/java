@@ -1,56 +1,60 @@
 package java;
 
+import org.mockito.internal.util.collections.Iterables;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Collection of entries for the account. Use it to save and get history of payments
  */
 public class Entries {
-    private final LinkedList<Entry> entries;
+    private final TreeMap<LocalDateTime, List<Entry>> entries;
 
     public Entries() {
-        this.entries = new LinkedList<Entry>();
+        this.entries = new TreeMap<>();
     }
 
     void addEntry(Entry entry) {
-        entries.add(entry);
+        LocalDateTime entyDateTime = entry.getTime();
+        if (!entries.containsKey(entyDateTime)) {
+            entries.put(entyDateTime, new ArrayList<>());
+        }
+        entries.get(entyDateTime).add(entry);
     }
 
     Collection<Entry> from(LocalDateTime date) {
         List<Entry> entriesFrom = new ArrayList<Entry>();
-        for (Entry entry: entries) {
-            if (date.isBefore(entry.getTime())) {
-                entriesFrom.add(entry);
+        for (LocalDateTime dateTime : entries.keySet()) {
+            if (date.isBefore(dateTime)) {
+                entriesFrom.addAll(entries.get(dateTime));
             }
         }
         return entriesFrom;
     }
 
     Collection<Entry> to(LocalDateTime date) {
-        List<Entry> entriesFrom = new ArrayList<Entry>();
-        for (Entry entry: entries) {
-            if (date.isAfter(entry.getTime())) {
-                entriesFrom.add(entry);
+        List<Entry> entriesTo = new ArrayList<Entry>();
+        for (LocalDateTime dateTime : entries.keySet()) {
+            if (date.isAfter(dateTime)) {
+                entriesTo.addAll(entries.get(dateTime));
             }
         }
-        return entriesFrom;
+        return entriesTo;
     }
 
     Collection<Entry> betweenDates(LocalDateTime from, LocalDateTime to) {
         List<Entry> entriesBetween = new ArrayList<Entry>();
-        for (Entry entry: entries) {
-            if (from.isBefore(entry.getTime()) && to.isAfter(entry.getTime())) {
-                entriesBetween.add(entry);
+        for (LocalDateTime dateTime : entries.keySet()) {
+            if (from.isBefore(dateTime) && to.isAfter(dateTime)) {
+                entriesBetween.addAll(entries.get(dateTime));
             }
         }
         return entriesBetween;
     }
 
     Entry last() {
-        return entries.getLast();
+        List<Entry> entriesFromLastDate = entries.get(entries.lastKey());
+        return entriesFromLastDate.get(entriesFromLastDate.size() - 1);
     }
 }
