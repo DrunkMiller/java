@@ -1,3 +1,5 @@
+package java;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;

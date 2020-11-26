@@ -1,5 +1,6 @@
-import org.junit.jupiter.api.Test;
+package java;
 
+import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
