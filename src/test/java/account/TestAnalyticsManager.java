@@ -1,19 +1,12 @@
-package java;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+package account;
 
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestAnalyticsManager {
     @Test

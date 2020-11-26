@@ -1,7 +1,6 @@
-package java;
+package account;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 public class Entry {
     private final Account account;
