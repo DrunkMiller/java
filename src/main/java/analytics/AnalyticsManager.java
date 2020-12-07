@@ -17,20 +17,15 @@ public class AnalyticsManager {
     }
 
     public DebitCard mostFrequentBeneficiaryOfAccount(DebitCard account) {
-        Map<DebitCard, Integer> transfersFrequency = new HashMap<DebitCard, Integer>();
-        for (Transaction transaction : transactionManager.findAllTransactionsByAccount(account)) {
-            if (transaction.getOriginator() != null && transaction.getOriginator().equals(account)) {
-                DebitCard currentBeneficiary = transaction.getBeneficiary();
-                if (transfersFrequency.containsKey(currentBeneficiary)) {
-                    transfersFrequency.put(currentBeneficiary, transfersFrequency.get(currentBeneficiary) + 1);
-                }
-                else {
-                    transfersFrequency.put(currentBeneficiary, 1);
-                }
-            }
+        Map<DebitCard, Integer> transfersFrequency = new HashMap<>();
+        for (var transaction : transactionManager.findAllTransactionsByAccount(account)) {
+            DebitCard currentBeneficiary = transaction.getBeneficiary();
+            transfersFrequency.putIfAbsent(currentBeneficiary, 0);
+            transfersFrequency.put(currentBeneficiary, transfersFrequency.get(currentBeneficiary) + 1);
         }
+
         DebitCard mostFrequentBeneficiary = null;
-        Integer maxFrequency = -1;
+        Integer maxFrequency = Integer.MIN_VALUE;
         for (Map.Entry<DebitCard, Integer> entry : transfersFrequency.entrySet()) {
             if (maxFrequency < entry.getValue()) {
                 mostFrequentBeneficiary = entry.getKey();
@@ -42,18 +37,10 @@ public class AnalyticsManager {
 
     public Collection<Transaction> topTenExpensivePurchases(DebitCard account) {
         List<Transaction> allTransactionsByAccount = new ArrayList<Transaction>(transactionManager.findAllTransactionsByAccount(account));
-        allTransactionsByAccount.sort(new Comparator<Transaction>() {
-            @Override
-            public int compare(Transaction t1, Transaction t2) {
-                return Double.compare(t2.getAmount(), t1.getAmount());
-            }
-        });
-        if (allTransactionsByAccount.size() <= 10) {
-            return allTransactionsByAccount;
-        }
-        else {
-            return allTransactionsByAccount.subList(0, 10);
-        }
+        allTransactionsByAccount.sort(Comparator.comparing(Transaction::getAmount));
+        int numberTransactionsByAccount = allTransactionsByAccount.size();
+        Collections.reverse(allTransactionsByAccount);
+        return allTransactionsByAccount.subList(0, numberTransactionsByAccount > 10 ? 10 : numberTransactionsByAccount);
     }
 
     public double overallBalanceOfAccounts(List<? extends Account> accounts) {
@@ -65,7 +52,7 @@ public class AnalyticsManager {
         return overallBalance;
     }
 
-    public <T, K extends Comparable<? super K>> Set<K> uniqueKeysOf(List<? extends T> entities, KeyExtractor<K, ? super T> extractor) {
+    public <T, K> Set<K> uniqueKeysOf(List<T> entities, KeyExtractor<K, T> extractor) {
         Set<K> uniqueKeys = new TreeSet<>();
         for (T entity : entities) {
             uniqueKeys.add(extractor.extract(entity));
@@ -73,8 +60,8 @@ public class AnalyticsManager {
         return uniqueKeys;
     }
 
-    public List<Account> accountsRangeFrom(List<? extends Account> accounts, Account minAccount, Comparator<Account> comparator) {
-        List<Account> sortedAccounts = new ArrayList<>(accounts);
+    public <T extends Account> List<T> accountsRangeFrom(List<T> accounts, T minAccount, Comparator<? super Account> comparator) {
+        List<T> sortedAccounts = new ArrayList<>(accounts);
         sortedAccounts.sort(comparator);
         return sortedAccounts.subList(sortedAccounts.indexOf(minAccount), sortedAccounts.size());
     }
