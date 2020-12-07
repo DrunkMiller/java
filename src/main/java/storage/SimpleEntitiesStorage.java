@@ -26,7 +26,7 @@ public class SimpleEntitiesStorage<K, T> implements BankEntitiesStorage<K, T> {
     }
 
     @Override
-    public T findByKey(Object key) {
+    public T findByKey(K key) {
         return storage.get(key);
     }
 
@@ -36,7 +36,7 @@ public class SimpleEntitiesStorage<K, T> implements BankEntitiesStorage<K, T> {
     }
 
     @Override
-    public void deleteByKey(Object key) {
+    public void deleteByKey(K key) {
         if (key != null && storage.containsKey(key)) {
             storage.remove(key);
         }
