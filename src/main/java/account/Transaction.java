@@ -28,10 +28,6 @@ public class Transaction {
         this.rolledBack = rolledBack;
     }
 
-    public long getId() {
-        return id;
-    }
-
     public Account getOriginator() {
         return originator;
     }
