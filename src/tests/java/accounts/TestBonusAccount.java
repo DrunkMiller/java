@@ -1,7 +1,6 @@
 package accounts;
 
 import org.junit.jupiter.api.Test;
-import transactions.Transaction;
 import transactions.TransactionManager;
 
 import java.time.LocalDateTime;

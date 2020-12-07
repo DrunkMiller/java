@@ -56,7 +56,7 @@ public class Transaction {
     }
 
     /**
-     * Adding entries to both accounts
+     * Adding entries to both main.java.accounts
      * @throws IllegalStateException when was already executed
      */
     public Transaction execute() {

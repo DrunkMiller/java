@@ -3,7 +3,6 @@ package analytics;
 import accounts.Account;
 import accounts.DebitCard;
 import storage.KeyExtractor;
-import storage.TransactionKeyExtractor;
 import transactions.Transaction;
 import transactions.TransactionManager;
 

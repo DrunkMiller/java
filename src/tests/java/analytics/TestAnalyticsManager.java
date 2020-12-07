@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import analytics.AnalyticsManager;
 import accounts.Account;
 import accounts.BonusAccount;
 import accounts.DebitCard;
 import org.junit.jupiter.api.Test;
-import storage.KeyExtractor;
 import storage.TransactionKeyExtractor;
 import transactions.Transaction;
 import transactions.TransactionManager;

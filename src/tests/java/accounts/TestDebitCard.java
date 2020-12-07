@@ -1,6 +1,5 @@
 package accounts;
 
-import accounts.DebitCard;
 import org.junit.jupiter.api.Test;
 import transactions.TransactionManager;
 

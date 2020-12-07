@@ -1,6 +1,5 @@
 package accounts;
 
-import accounts.Account;
 import transactions.Transaction;
 
 import java.time.LocalDateTime;
