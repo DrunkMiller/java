@@ -16,17 +16,17 @@ public class AnalyticsManager {
         this.transactionManager = transactionManager;
     }
 
-    public DebitCard mostFrequentBeneficiaryOfAccount(DebitCard account) {
-        Map<DebitCard, Integer> transfersFrequency = new HashMap<>();
+    public Account mostFrequentBeneficiaryOfAccount(Account account) {
+        Map<Account, Integer> transfersFrequency = new HashMap<>();
         for (var transaction : transactionManager.findAllTransactionsByAccount(account)) {
-            DebitCard currentBeneficiary = transaction.getBeneficiary();
+            Account currentBeneficiary = transaction.getBeneficiary();
             transfersFrequency.putIfAbsent(currentBeneficiary, 0);
             transfersFrequency.put(currentBeneficiary, transfersFrequency.get(currentBeneficiary) + 1);
         }
 
-        DebitCard mostFrequentBeneficiary = null;
+        Account mostFrequentBeneficiary = null;
         Integer maxFrequency = Integer.MIN_VALUE;
-        for (Map.Entry<DebitCard, Integer> entry : transfersFrequency.entrySet()) {
+        for (Map.Entry<Account, Integer> entry : transfersFrequency.entrySet()) {
             if (maxFrequency < entry.getValue()) {
                 mostFrequentBeneficiary = entry.getKey();
                 maxFrequency = entry.getValue();
@@ -36,7 +36,7 @@ public class AnalyticsManager {
     }
 
     public Collection<Transaction> topTenExpensivePurchases(DebitCard account) {
-        List<Transaction> allTransactionsByAccount = new ArrayList<Transaction>(transactionManager.findAllTransactionsByAccount(account));
+        List<Transaction> allTransactionsByAccount = new ArrayList<>(transactionManager.findAllTransactionsByAccount(account));
         allTransactionsByAccount.sort(Comparator.comparing(Transaction::getAmount));
         int numberTransactionsByAccount = allTransactionsByAccount.size();
         Collections.reverse(allTransactionsByAccount);

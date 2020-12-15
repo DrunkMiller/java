@@ -30,12 +30,18 @@ public class DebitCard implements Account {
      * if amount &gt 0 and (currentBalance - amount) &ge 0,
      * otherwise returns false
      */
-    public boolean withdraw(double amount, DebitCard beneficiary) {
+    public boolean withdraw(double amount, Account beneficiary) {
         if (!canWithdraw(amount)) {
             return false;
         }
-        Transaction transaction = transactionManager.createTransaction(amount, this, beneficiary);
-        transactionManager.executeTransaction(transaction);
+        Transaction mainTransaction = transactionManager.createTransaction(amount, this, beneficiary);
+        transactionManager.executeTransaction(mainTransaction);
+        Transaction bonusTransaction = null;
+        if (bonusAccount != null) {
+            bonusTransaction = transactionManager.createTransaction(amount * bonusAccount.getBonusPercentage(), null, bonusAccount);
+            mainTransaction.addDependentTransaction(bonusTransaction);
+            transactionManager.executeTransaction(bonusTransaction);
+        }
         return true;
     }
 
@@ -48,12 +54,7 @@ public class DebitCard implements Account {
      * otherwise returns false
      */
     public boolean withdrawCash(double amount) {
-        if (!canWithdraw(amount)) {
-            return false;
-        }
-        Transaction transaction = transactionManager.createTransaction(amount, this, null);
-        transactionManager.executeTransaction(transaction);
-        return true;
+        return withdraw(amount, null);
     }
 
     /**
