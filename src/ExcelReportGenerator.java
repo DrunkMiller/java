@@ -1,10 +1,8 @@
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class ExcelReportGenerator<T> implements ReportGenerator<T> {
@@ -24,7 +22,7 @@ public class ExcelReportGenerator<T> implements ReportGenerator<T> {
         }
         List<String> fieldsNames = extractor.getFieldsNames();
         List<List<String>> fieldsValues = extractor.getFieldsValues(entities);
-        return new XmlReport(generateWorkbook(fieldsNames, fieldsValues));
+        return new XlsReport(generateWorkbook(fieldsNames, fieldsValues));
     }
 
     private Workbook generateWorkbook(List<String> fieldsNames,  List<List<String>> fieldsValues) {

@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class XmlReport implements Report{
+public class XlsReport implements Report{
     private final Workbook workbook;
 
-    public XmlReport(Workbook workbook) {
+    public XlsReport(Workbook workbook) {
         this.workbook = workbook;
     }
 

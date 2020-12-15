@@ -1,8 +1,10 @@
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SimpleClassExtractor<T> implements ClassExtractor<T> {
     private final Class<T> clazz;
@@ -18,34 +20,31 @@ public class SimpleClassExtractor<T> implements ClassExtractor<T> {
 
     @Override
     public List<List<String>> getFieldsValues(List<T> entities) {
-        List<List<String>> values = new LinkedList<>();
+        List<List<String>> values = new ArrayList<>();
         for (T entity : entities) {
-            List<String> currentValues = new ArrayList<>();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                try {
-                    currentValues.add(field.get(entity).toString());
-                } catch (Exception e) {
-                    currentValues.add("empty");
-                }
-            }
-            values.add(currentValues);
+            values.add(getValuesFromEntity(entity));
         }
         return values;
     }
 
-    @Override
-    public List<String> getFieldsNames() {
-        List<String> names = new ArrayList<>();
+    private List<String> getValuesFromEntity(T entity) {
+        List<String> currentValues = new ArrayList<>();
         for (Field field : fields) {
-            if (field.isAnnotationPresent(NameInReport.class)) {
-                names.add(field.getAnnotation(NameInReport.class).name());
-            }
-            else {
-                names.add(field.getName());
+            field.setAccessible(true);
+            try {
+                currentValues.add(field.get(entity).toString());
+            } catch (Exception e) {
+                currentValues.add("empty");
             }
         }
-        return names;
+        return currentValues;
+    }
+
+    @Override
+    public List<String> getFieldsNames() {
+        return fields.stream()
+                .map(field -> field.isAnnotationPresent(NameInReport.class) ? field.getAnnotation(NameInReport.class).name() : field.getName())
+                .collect(Collectors.toList());
     }
 
     private List<Field> getClassFields() {
@@ -55,6 +54,8 @@ public class SimpleClassExtractor<T> implements ClassExtractor<T> {
             fields.addAll(Arrays.asList(currentProcessedClass.getDeclaredFields()));
             currentProcessedClass = currentProcessedClass.getSuperclass();
         }
-        return fields;
+        return fields.stream()
+                .filter(f -> !f.isSynthetic() && !Modifier.isStatic(f.getModifiers()))
+                .collect(Collectors.toList());
     }
 }
