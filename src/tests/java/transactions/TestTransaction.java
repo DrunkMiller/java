@@ -5,6 +5,8 @@ import accounts.DebitCard;
 import accounts.Entry;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,6 +16,10 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTransaction {
+
+    private LocalDateTime systemDataTimeForTesting = LocalDateTime.now();
+    private int minutesToAdd = 0;
+
     @Test
     void execute_throwsException_whenWasAlreadyExecuted() {
         Transaction transaction = new Transaction(1, 100, null, null);
@@ -35,17 +41,21 @@ public class TestTransaction {
         TransactionManager transactionManager = new TransactionManager();
         DebitCard account1 = new DebitCard(1, transactionManager, new BonusAccount(0));
         DebitCard account2 = new DebitCard(2, transactionManager, new BonusAccount(0));
-        account1.add(200);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        TimeUnit.MILLISECONDS.sleep(1);
-        Transaction transaction = new Transaction(1, 100, account1, account2);
-        transaction.execute();
-        List<Entry> history1 = new ArrayList<Entry>(account1.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
-        List<Entry> history2 = new ArrayList<Entry>(account2.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
-        assertEquals(1, history1.size());
-        assertEquals(1, history2.size());
-        Assertions.assertEquals(-100, history1.get(0).getAmount());
-        Assertions.assertEquals(100, history2.get(0).getAmount());
+
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class)) {
+            mockedLocalDateTime.when(LocalDateTime::now).thenAnswer(inv -> systemDataTimeForTesting.plusMinutes(++minutesToAdd));
+
+            account1.add(200);
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            Transaction transaction = new Transaction(1, 100, account1, account2);
+            transaction.execute();
+            List<Entry> history1 = new ArrayList<>(account1.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
+            List<Entry> history2 = new ArrayList<>(account2.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
+            assertEquals(1, history1.size());
+            assertEquals(1, history2.size());
+            Assertions.assertEquals(-100, history1.get(0).getAmount());
+            Assertions.assertEquals(100, history2.get(0).getAmount());
+        }
     }
 
     @Test
@@ -53,18 +63,22 @@ public class TestTransaction {
         TransactionManager transactionManager = new TransactionManager();
         DebitCard account1 = new DebitCard(1, transactionManager, new BonusAccount(0));
         DebitCard account2 = new DebitCard(2, transactionManager, new BonusAccount(0));
-        account1.add(200);
-        Transaction transaction = new Transaction(1, 100, account1, account2);
-        Transaction executedTransaction = transaction.execute();
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        TimeUnit.SECONDS.sleep(1);
-        executedTransaction.rollback();
-        List<Entry> history1 = new ArrayList<Entry>(account1.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
-        List<Entry> history2 = new ArrayList<Entry>(account2.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
-        assertEquals(1, history1.size());
-        assertEquals(1, history2.size());
-        Assertions.assertEquals(100, history1.get(0).getAmount());
-        Assertions.assertEquals(-100, history2.get(0).getAmount());
+
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class)) {
+            mockedLocalDateTime.when(LocalDateTime::now).thenAnswer(inv -> systemDataTimeForTesting.plusMinutes(++minutesToAdd));
+
+            account1.add(200);
+            Transaction transaction = new Transaction(1, 100, account1, account2);
+            Transaction executedTransaction = transaction.execute();
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            executedTransaction.rollback();
+            List<Entry> history1 = new ArrayList<Entry>(account1.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
+            List<Entry> history2 = new ArrayList<Entry>(account2.history(currentDateTime, LocalDateTime.now().plusMinutes(1)));
+            assertEquals(1, history1.size());
+            assertEquals(1, history2.size());
+            Assertions.assertEquals(100, history1.get(0).getAmount());
+            Assertions.assertEquals(-100, history2.get(0).getAmount());
+        }
     }
 
     @Test

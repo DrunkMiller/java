@@ -1,6 +1,8 @@
 package accounts;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import transactions.TransactionManager;
 
 import java.time.LocalDateTime;
@@ -9,6 +11,10 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDebitCard {
+
+    private LocalDateTime systemDataTimeForTesting = LocalDateTime.now();
+    private int minutesToAdd = 0;
+
     @Test
     void withdraw_returnsFalse_whenAmountLessThanZero() {
         TransactionManager transactionManager = new TransactionManager();
@@ -31,9 +37,13 @@ public class TestDebitCard {
         TransactionManager transactionManager = new TransactionManager();
         DebitCard beneficiaryAccount = new DebitCard(1, transactionManager, new BonusAccount(0));
         DebitCard originatorAccount = new DebitCard(2, transactionManager, new BonusAccount(0));
-        beneficiaryAccount.add(100);
-        TimeUnit.MILLISECONDS.sleep(1);
-        assertTrue(beneficiaryAccount.withdraw(50, originatorAccount));
+
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class)) {
+            mockedLocalDateTime.when(LocalDateTime::now).thenAnswer(inv -> systemDataTimeForTesting.plusMinutes(++minutesToAdd));
+
+            beneficiaryAccount.add(100);
+            assertTrue(beneficiaryAccount.withdraw(50, originatorAccount));
+        }
     }
 
     @Test
@@ -55,9 +65,13 @@ public class TestDebitCard {
     void withdrawCash_returnsTrue_whenAmountSuit() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
         DebitCard account = new DebitCard(1, transactionManager, new BonusAccount(0));
-        account.add(100);
-        TimeUnit.MILLISECONDS.sleep(1);
-        assertTrue(account.withdrawCash(50));
+
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class)) {
+            mockedLocalDateTime.when(LocalDateTime::now).thenAnswer(inv -> systemDataTimeForTesting.plusMinutes(++minutesToAdd));
+
+            account.add(100);
+            assertTrue(account.withdrawCash(50));
+        }
     }
 
     @Test
@@ -92,17 +106,20 @@ public class TestDebitCard {
     void balanceOn_shouldReturnCorrectBalanceOnDate() throws InterruptedException {
         TransactionManager transactionManager = new TransactionManager();
         DebitCard account = new DebitCard(1, transactionManager, new BonusAccount(0));
-        account.addCash(1000);
-        account.add(500);
-        TimeUnit.MILLISECONDS.sleep(1);
-        account.withdrawCash(500);
-        account.withdraw(500, new DebitCard(2, transactionManager, new BonusAccount(0)));
-        LocalDateTime currentDateTime1 = LocalDateTime.now().plusNanos(10);
-        TimeUnit.MILLISECONDS.sleep(1);
-        account.addCash(200);
-        account.withdrawCash(100);
-        LocalDateTime currentDateTime2 = LocalDateTime.now().plusNanos(10);
-        assertEquals(500, account.balanceOn(currentDateTime1));
-        assertEquals(600, account.balanceOn(currentDateTime2));
+        try (MockedStatic<LocalDateTime> mockedLocalDateTime = Mockito.mockStatic(LocalDateTime.class)) {
+            mockedLocalDateTime.when(LocalDateTime::now).thenAnswer(inv -> systemDataTimeForTesting.plusMinutes(++minutesToAdd));
+
+            account.addCash(1000);
+            account.add(500);
+            account.withdrawCash(500);
+            account.withdraw(500, new DebitCard(2, transactionManager, new BonusAccount(0)));
+            LocalDateTime currentDateTime1 = LocalDateTime.now();
+
+            account.addCash(200);
+            account.withdrawCash(100);
+            LocalDateTime currentDateTime2 = LocalDateTime.now();
+            assertEquals(500, account.balanceOn(currentDateTime1));
+            assertEquals(600, account.balanceOn(currentDateTime2));
+        }
     }
 }
