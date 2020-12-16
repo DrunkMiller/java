@@ -56,7 +56,7 @@ public class ScalableThreadPool implements ThreadPool {
         synchronized (workers) {
             if (workers.size() < maxPoolSize && countWorking == workers.size()) {
                 addWorker();
-                synchronized (countWorking) { System.out.println("# Pool size changed: total:" + workers.size()+ " working:" + countWorking); }
+                System.out.println("# Pool size changed: total:" + workers.size()+ " working:" + countWorking);
             }
         }
     }
@@ -73,7 +73,7 @@ public class ScalableThreadPool implements ThreadPool {
         synchronized (workers) {
             if (getCountUnprocessedTasks() == 0 && workers.size() > minPoolSize) {
                 workers.remove(thread);
-                synchronized (countWorking) { System.out.println("# Pool size changed: total:" + workers.size() + " working:" + countWorking); }
+                System.out.println("# Pool size changed: total:" + workers.size() + " working:" + countWorking);
                 return false;
             }
         }
@@ -81,13 +81,13 @@ public class ScalableThreadPool implements ThreadPool {
     }
 
     private void work() {
-        synchronized (countWorking) {
+        synchronized (workers) {
             countWorking++;
         }
     }
 
     private void freed() {
-        synchronized (countWorking) {
+        synchronized (workers) {
             countWorking--;
         }
     }
