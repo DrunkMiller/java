@@ -36,7 +36,9 @@ public class ScalableThreadPool implements ThreadPool {
         synchronized (tasks) {
             tasks.notifyAll();
         }
-        workers.clear();
+        synchronized (workers) {
+            workers.clear();
+        }
     }
 
     int getCountUnprocessedTasks() {
@@ -50,24 +52,30 @@ public class ScalableThreadPool implements ThreadPool {
         synchronized (tasks) {
             tasks.add(runnable);
             tasks.notify();
+        }
+        synchronized (workers) {
             if (workers.size() < maxPoolSize && countWorking == workers.size()) {
-               addWorker();
-               synchronized (countWorking) { System.out.println("# Pool size changed: total:" + workers.size()+ " working:" + countWorking); }
+                addWorker();
+                synchronized (countWorking) { System.out.println("# Pool size changed: total:" + workers.size()+ " working:" + countWorking); }
             }
         }
     }
 
     private void addWorker() {
-        Thread thread = new Thread(new Worker());
-        workers.add(thread);
-        thread.start();
+        synchronized (workers) {
+            Thread thread = new Thread(new Worker());
+            workers.add(thread);
+            thread.start();
+        }
     }
 
     private boolean workFurther(Thread thread) {
-        if (getCountUnprocessedTasks() == 0 && workers.size() > minPoolSize) {
-            workers.remove(thread);
-            synchronized (countWorking) { System.out.println("# Pool size changed: total:" + workers.size()+ " working:" + countWorking); }
-            return false;
+        synchronized (workers) {
+            if (getCountUnprocessedTasks() == 0 && workers.size() > minPoolSize) {
+                workers.remove(thread);
+                synchronized (countWorking) { System.out.println("# Pool size changed: total:" + workers.size() + " working:" + countWorking); }
+                return false;
+            }
         }
         return true;
     }
